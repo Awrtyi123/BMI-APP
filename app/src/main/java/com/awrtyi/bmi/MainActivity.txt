@@ -1,0 +1,95 @@
+package com.awrtyi.bmi;   // 请替换成你自己的包名
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText etHeight, etWeight;
+    private Button btnCalculate;
+    private TextView tvResult;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // 绑定控件
+        etHeight = findViewById(R.id.et_height);
+        etWeight = findViewById(R.id.et_weight);
+        btnCalculate = findViewById(R.id.btn_calculate);
+        tvResult = findViewById(R.id.tv_result);
+
+        btnCalculate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calculateBMI();
+            }
+        });
+    }
+
+    private void calculateBMI() {
+        // 获取输入的字符串
+        String heightStr = etHeight.getText().toString().trim();
+        String weightStr = etWeight.getText().toString().trim();
+
+        // 检查是否为空
+        if (heightStr.isEmpty() || weightStr.isEmpty()) {
+            tvResult.setText("请输入身高和体重！");
+            return;
+        }
+
+        try {
+            double height = Double.parseDouble(heightStr);
+            double weight = Double.parseDouble(weightStr);
+
+            // 简单范围校验（防止异常值）
+            if (height < 0.5 || height > 3.0) {
+                tvResult.setText("身高请输入 0.5 ~ 3.0 米");
+                return;
+            }
+            if (weight < 10 || weight > 500) {
+                tvResult.setText("体重请输入 10 ~ 500 公斤");
+                return;
+            }
+
+            // 调用计算逻辑，得到结果字符串
+            String result = getBMIResult(height, weight);
+            tvResult.setText(result);
+
+        } catch (NumberFormatException e) {
+            tvResult.setText("请输入有效的数字！");
+        }
+    }
+
+    /**
+     * 根据身高和体重计算 BMI 并返回完整结果字符串
+     * 代码逻辑完全参照你原来的 BMIdemo.java
+     */
+    private String getBMIResult(double height, double weight) {
+        double bmi = weight / (height * height);
+        String rating;
+
+        if (bmi < 18.5) {
+            rating = "过轻";
+        } else if (bmi <= 22.9) {
+            rating = "正常";
+        } else if (bmi <= 24.9) {
+            rating = "偏胖";
+        } else if (bmi <= 29.9) {
+            rating = "肥胖";
+        } else if (bmi <= 40) {
+            rating = "重度肥胖";
+        } else {
+            rating = "极度肥胖";
+        }
+
+        // 格式化 BMI 保留两位小数
+        String bmiFormatted = String.format("%.2f", bmi);
+        return "您的 BMI 指数：" + bmiFormatted + "\n您的体重属于：" + rating;
+    }
+}
